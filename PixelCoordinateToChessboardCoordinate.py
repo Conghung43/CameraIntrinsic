@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import ChessboardTransformMatrix
 
 def DrawAxis(img, corners_3d, rvecs, tvecs, camera_matrix, distortion_coeffs):
     # Draw origin (coordinate axes)
@@ -22,14 +23,50 @@ def DrawAxis(img, corners_3d, rvecs, tvecs, camera_matrix, distortion_coeffs):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def pixel2world(pixel_coords, camera_matrix, distortion_coeffs, rvecs, tvecs):
+    # Convert pixel coordinates to normalized coordinates
+    u, v = pixel_coords
+    u_norm = (u - camera_matrix[0, 2]) / camera_matrix[0, 0]
+    v_norm = (v - camera_matrix[1, 2]) / camera_matrix[1, 1]
 
+    # Undistort normalized coordinates
+    undist_coords = cv2.undistortPoints(np.array([[u_norm, v_norm]], dtype=np.float32), camera_matrix, distortion_coeffs)
+
+    # SolvePnP to get world coordinates
+    _, rvecs, tvecs, _ = cv2.solvePnPRansac(objp, corners2, camera_matrix, distortion_coeffs)
+    R, _ = cv2.Rodrigues(rvecs)
+    world_coords = np.dot(R.T, objp.T) + np.repeat(tvecs, 1, axis=1)
+
+    return world_coords.squeeze()
+
+def convert_points_with_homography(points, H):
+    """
+    Convert a list of points from the source image to the destination image using a homography matrix.
+
+    Args:
+    - points: List of points in the source image, each point should be a tuple (x, y).
+    - H: Homography matrix.
+
+    Returns:
+    - List of points in the destination image, each point is a tuple (x, y).
+    """
+    # Convert points to numpy array for easier manipulation
+    points_np = np.array(points, dtype=np.float32)
+
+    # Convert points from source image to destination image using perspective transform
+    points_dst = cv2.perspectiveTransform(points_np.reshape(-1, 1, 2), H)
+
+    # Convert points back to list of tuples
+    points_dst_list = [(point[0][0], point[0][1]) for point in points_dst]
+
+    return points_dst_list
 
 # Chessboard size
 board_width = 9
 board_height = 6
 
 # Grid size in mm
-grid_size_mm = 20
+grid_size_mm = 16
 
 # Prepare object points
 objp = np.zeros((board_width * board_height, 3), np.float32)
@@ -53,15 +90,16 @@ camera_matrix = np.array([[focal_length_mm[0], 0, principal_point_mm[0]],
 # Example: dist_coeffs = [k1, k2, p1, p2, k3]
 dist_coeffs = np.zeros((5, 1))  # example values, replace with your camera's distortion coefficients
 
-calibration_data = np.load('calibration_data_iphone1.npz')  # Load calibration data obtained from cv2.calibrateCamera
+calibration_data = np.load('calibration_data_hannah.npz')  # Load calibration data obtained from cv2.calibrateCamera
 camera_matrix = calibration_data['mtx']
 dist_coeffs = calibration_data['dist']
 
 # Load the image
-image = cv2.imread('/Users/hungnguyencong/Downloads/iphone_test/IMG_3300.JPG')  # Replace 'chessboard_image.jpg' with your image path
+image = cv2.imread('images/chessboard 0409 V2 on the vibration plate/CV3-2000M-19RT-Snapshot-20240409-145637-949-812665090389.PNG')  # Replace 'chessboard_image.jpg' with your image path
 
 # Undistorsion image
 image = cv2.undistort(image, camera_matrix, dist_coeffs)
+cv2.imwrite("transformed_image_undistor.jpg", image)
 
 # Convert the image to grayscale
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -90,6 +128,17 @@ if ret == True:
 
     # Calculate the rotation and translation vectors
     ret, rvecs, tvecs, inliers = cv2.solvePnPRansac(objp, corners2, camera_matrix, dist_coeffs)
+
+
+
+    u, v = 942, 708  # Replace with your actual pixel coordinates
+
+    # Get the 3D position of the point
+    world_coords = pixel2world((u, v), camera_matrix, dist_coeffs, rvecs, tvecs)
+
+
+
+
 
     # Convert rotation vectors to rotation matrix
     R, _ = cv2.Rodrigues(rvecs)
@@ -121,6 +170,23 @@ if ret == True:
 
     # Calculate the homography
     H, _ = cv2.findHomography(corner_points, dst_points)
+
+    points_src = [(3980, 2468), (4397, 845)]
+
+    # Convert points from source image to destination image
+    points_dst = convert_points_with_homography(points_src, H)
+
+    # Convert point on destination image to 3D
+    point_dst_3d = np.array(points_dst[0])/(dst_points[2])*np.array([grid_size_mm*(board_width-1), grid_size_mm*(board_height-1)])
+
+    point_dst_3d = np.append(point_dst_3d, 0)
+    point_dst_3d = np.append(point_dst_3d, 1)
+    objectToRobotTransformMatrix = np.dot(ChessboardTransformMatrix.ChessboardToRobotMatrix(),point_dst_3d)
+
+
+
+
+
 
     # Apply the transformation
     transformed_image = cv2.warpPerspective(image, H, (image.shape[1], int(image.shape[1]*(board_height-1)/(board_width-1))))

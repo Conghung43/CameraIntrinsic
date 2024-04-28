@@ -4,7 +4,8 @@ import os
 
 # Define the size of the chessboard and grid size
 pattern_size = (9, 6)  # Number of inner corners along the rows and columns of the chessboard
-square_size = 20  # Size of each square in mm
+square_size = 30.6  #  open with mac in 22 inch monitor 
+# 21  with mac screen
 
 # Prepare object points, like (0,0,0), (20,0,0), (40,0,0) ....,(160,100,0)
 object_points = np.zeros((np.prod(pattern_size), 3), dtype=np.float32)
@@ -21,28 +22,28 @@ image_count = 0
 def read_images_from_folder(folder_path):
     images = []
     for filename in os.listdir(folder_path):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.bmp','.JPG')):  # Add more extensions if needed
+        if filename.endswith(('.png', '.jpg', '.jpeg', '.bmp','.JPG', '.PNG')):  # Add more extensions if needed
             image_path = os.path.join(folder_path, filename)
             
             #if image is not None:
             images.append(image_path)
     return images
 
-images = read_images_from_folder("/Users/hungnguyencong/Downloads/IphoneChessboard2")
+# images = read_images_from_folder("images/CameraCapture")
 
 # for frame in images:
 # Capture images from camera
 num_images = 200  # Number of images to capture
 image_count = 0
 
-#cap = cv2.VideoCapture("images/V_20240314_111248_N0.mp4")
+cap = cv2.VideoCapture("/Users/hungnguyencong/Downloads/IMG_3521.MOV")
 
-# while image_count < num_images:
-#     ret, frame = cap.read()
-#     if not ret:
-#         break
-for path in images:
-    frame = cv2.imread(path)
+while True:#image_count < num_images:
+    ret, frame = cap.read()
+    if not ret:
+        break
+# for path in images:
+    # frame = cv2.imread(path)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Find the chessboard corners
@@ -50,7 +51,7 @@ for path in images:
 
     # If found, add object points, image points
     if ret:
-        print(path)
+        # print(path)
         object_points_list.append(object_points)
         image_points_list.append(corners)
 
