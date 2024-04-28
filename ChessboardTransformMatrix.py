@@ -1,4 +1,11 @@
 import numpy as np
+
+def save_matrix(file_path, matrix):
+    np.savetxt(file_path, matrix)
+
+def load_matrix(file_path):
+    return np.loadtxt(file_path)
+
 def ChessboardToRobotMatrix():
     # Define the corner points of the chessboard in the robot world coordinate system
     chessboard_points = np.array([[36, 12,  -30],
@@ -27,3 +34,9 @@ def ChessboardToRobotMatrix():
     return transform_matrix
 
 # ChessboardToRobotMatrix()
+# file_path = "transform_matrix.txt"
+# save_matrix(file_path, ChessboardToRobotMatrix())
+
+# loaded_matrix = load_matrix(file_path)
+# print("Loaded Matrix:")
+# print(loaded_matrix)

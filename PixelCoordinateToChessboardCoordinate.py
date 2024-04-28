@@ -171,6 +171,10 @@ if ret == True:
     # Calculate the homography
     H, _ = cv2.findHomography(corner_points, dst_points)
 
+    # Save homography
+    # file_path = "h_matrix.txt"
+    # ChessboardTransformMatrix.save_matrix(file_path, H)
+
     points_src = [(3980, 2468), (4397, 845)]
 
     # Convert points from source image to destination image
