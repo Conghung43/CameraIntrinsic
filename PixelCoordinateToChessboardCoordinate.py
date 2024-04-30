@@ -66,7 +66,7 @@ board_width = 9
 board_height = 6
 
 # Grid size in mm
-grid_size_mm = 16
+grid_size_mm = 16.45
 
 # Prepare object points
 objp = np.zeros((board_width * board_height, 3), np.float32)
@@ -95,7 +95,7 @@ camera_matrix = calibration_data['mtx']
 dist_coeffs = calibration_data['dist']
 
 # Load the image
-image = cv2.imread('images/chessboard 0409 V2 on the vibration plate/CV3-2000M-19RT-Snapshot-20240409-145637-949-812665090389.PNG')  # Replace 'chessboard_image.jpg' with your image path
+image = cv2.imread('/Users/hungnguyencong/Downloads/rawImg.jpg')  # Replace 'chessboard_image.jpg' with your image path
 
 # Undistorsion image
 image = cv2.undistort(image, camera_matrix, dist_coeffs)
@@ -172,8 +172,8 @@ if ret == True:
     H, _ = cv2.findHomography(corner_points, dst_points)
 
     # Save homography
-    # file_path = "h_matrix.txt"
-    # ChessboardTransformMatrix.save_matrix(file_path, H)
+    file_path = "h_matrix.txt"
+    ChessboardTransformMatrix.save_matrix(file_path, H)
 
     points_src = [(3980, 2468), (4397, 845)]
 
