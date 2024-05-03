@@ -17,7 +17,7 @@ def DrawAxis(img, corners_3d, rvecs, tvecs, camera_matrix, distortion_coeffs):
         img = cv2.line(img, axes_points[0], axes_points[1], (0, 0, 255), 3)  # X-axis (red)
         img = cv2.line(img, axes_points[0], axes_points[2], (0, 255, 0), 3)  # Y-axis (green)
         img = cv2.line(img, axes_points[0], axes_points[3], (255, 0, 0), 3)  # Z-axis (blue)
-
+        break
     # Show the image with coordinate axes
     cv2.imshow('Coordinate Axes', img)
     cv2.waitKey(0)
@@ -66,7 +66,7 @@ board_width = 9
 board_height = 6
 
 # Grid size in mm
-grid_size_mm = 16.45
+grid_size_mm = 19.15
 
 # Prepare object points
 objp = np.zeros((board_width * board_height, 3), np.float32)
@@ -78,24 +78,24 @@ imgpoints = []  # 2D points in image plane
 
 # Load camera intrinsic parameters (you need to provide this)
 # Example: focal_length_mm = [fx, fy] and principal_point_mm = [cx, cy]
-focal_length_mm = [800, 800]  # example values, replace with your camera's focal length
-principal_point_mm = [320, 240]  # example values, replace with your camera's principal point
+# focal_length_mm = [800, 800]  # example values, replace with your camera's focal length
+# principal_point_mm = [320, 240]  # example values, replace with your camera's principal point
 
-# Camera intrinsic matrix
-camera_matrix = np.array([[focal_length_mm[0], 0, principal_point_mm[0]],
-                           [0, focal_length_mm[1], principal_point_mm[1]],
-                           [0, 0, 1]], dtype=np.float32)
+# # Camera intrinsic matrix
+# camera_matrix = np.array([[focal_length_mm[0], 0, principal_point_mm[0]],
+#                            [0, focal_length_mm[1], principal_point_mm[1]],
+#                            [0, 0, 1]], dtype=np.float32)
 
 # Load camera distortion coefficients (you need to provide this)
 # Example: dist_coeffs = [k1, k2, p1, p2, k3]
 dist_coeffs = np.zeros((5, 1))  # example values, replace with your camera's distortion coefficients
 
-calibration_data = np.load('calibration_data_hannah.npz')  # Load calibration data obtained from cv2.calibrateCamera
+calibration_data = np.load('CameraIntrinsic/calibration_data_self.npz')  # Load calibration data obtained from cv2.calibrateCamera
 camera_matrix = calibration_data['mtx']
 dist_coeffs = calibration_data['dist']
 
 # Load the image
-image = cv2.imread('/Users/hungnguyencong/Downloads/rawImg.jpg')  # Replace 'chessboard_image.jpg' with your image path
+image = cv2.imread('img.jpg')  # Replace 'chessboard_image.jpg' with your image path
 
 # Undistorsion image
 image = cv2.undistort(image, camera_matrix, dist_coeffs)

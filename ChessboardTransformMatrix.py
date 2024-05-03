@@ -8,9 +8,14 @@ def load_matrix(file_path):
 
 def ChessboardToRobotMatrix():
     # Define the corner points of the chessboard in the robot world coordinate system
-    chessboard_points = np.array([ [0.582, 6.766,  -30],
-                                  [82.896, 7.839,  -30],
-                                [81.206, 139.571,  -30]])
+    # chessboard_points = np.array([ [0.582, 6.766,  -30],
+    #                               [82.896, 7.839,  -30],
+    #                             [81.206, 139.571,  -30]])
+
+    chessboard_points = np.array([
+                                  [73, 87,  -30],
+                                  [82, 182,  -30],
+                                [235, 166.5,  -30]])
 
     # Define the origin corner point of the chessboard in the robot world coordinate system
     origin_point = chessboard_points[1]
@@ -34,7 +39,7 @@ def ChessboardToRobotMatrix():
     return transform_matrix
 
 # ChessboardToRobotMatrix()
-file_path = "transform_matrix.txt"
+file_path = "transform_matrix_self.txt"
 save_matrix(file_path, ChessboardToRobotMatrix())
 
 loaded_matrix = load_matrix(file_path)

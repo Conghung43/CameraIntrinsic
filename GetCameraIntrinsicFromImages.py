@@ -4,7 +4,7 @@ import os
 
 # Define the size of the chessboard and grid size
 pattern_size = (9, 6)  # Number of inner corners along the rows and columns of the chessboard
-square_size = 30.6  #  open with mac in 22 inch monitor 
+square_size = 19.15  #  open with mac in 22 inch monitor 
 # 21  with mac screen
 
 # Prepare object points, like (0,0,0), (20,0,0), (40,0,0) ....,(160,100,0)
@@ -29,21 +29,30 @@ def read_images_from_folder(folder_path):
             images.append(image_path)
     return images
 
-# images = read_images_from_folder("images/CameraCapture")
-
 # for frame in images:
 # Capture images from camera
 num_images = 200  # Number of images to capture
 image_count = 0
 
-cap = cv2.VideoCapture("/Users/hungnguyencong/Downloads/IMG_3521.MOV")
+# Initialize the camera
+cap = cv2.VideoCapture(1)  # Use 0 for the first camera, 1 for the second, and so on
 
+# Check if the camera opened successfully
+if not cap.isOpened():
+    print("Error: Unable to open camera")
+    exit()
+
+# cap = cv2.VideoCapture("/Users/hungnguyencong/Downloads/IMG_3521.MOV")
 while True:#image_count < num_images:
     ret, frame = cap.read()
     if not ret:
         break
+
+# images = read_images_from_folder("/Users/hungnguyencong/Documents/UNITY/arfoundation-samples/Images")
 # for path in images:
-    # frame = cv2.imread(path)
+#     frame = cv2.imread(path)
+
+    
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Find the chessboard corners
@@ -55,10 +64,12 @@ while True:#image_count < num_images:
         object_points_list.append(object_points)
         image_points_list.append(corners)
 
-        # Draw and display the corners
-        # cv2.drawChessboardCorners(frame, pattern_size, corners, ret)
-        # cv2.imshow('Chessboard', frame)
-        # cv2.waitKey(500)  # Adjust wait time as needed
+        # Display the resulting frame
+        cv2.imshow('Frame', frame)
+
+        # Wait for 'q' key to exit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
         image_count += 1
         print(image_count)
@@ -70,7 +81,7 @@ cv2.destroyAllWindows()
 ret, camera_matrix, distortion_coefficients, rvecs, tvecs = cv2.calibrateCamera(
     object_points_list, image_points_list, gray.shape[::-1], None, None)
 
-np.savez('calibration_data_iphone.npz', mtx=camera_matrix, dist=distortion_coefficients)
+np.savez('CameraIntrinsic/calibration_data_self.npz', mtx=camera_matrix, dist=distortion_coefficients)
 
 # Print the intrinsic parameters
 print("Camera Matrix:")
