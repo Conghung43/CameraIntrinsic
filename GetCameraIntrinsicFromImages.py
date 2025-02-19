@@ -35,23 +35,24 @@ num_images = 200  # Number of images to capture
 image_count = 0
 
 # Initialize the camera
-cap = cv2.VideoCapture(1)  # Use 0 for the first camera, 1 for the second, and so on
+# cap = cv2.VideoCapture(1)  # Use 0 for the first camera, 1 for the second, and so on
 
-# Check if the camera opened successfully
-if not cap.isOpened():
-    print("Error: Unable to open camera")
-    exit()
+# # Check if the camera opened successfully
+# if not cap.isOpened():
+#     print("Error: Unable to open camera")
+#     exit()
 
-# cap = cv2.VideoCapture("/Users/hungnguyencong/Downloads/IMG_3521.MOV")
+cap = cv2.VideoCapture("/Users/hungnguyencong/Downloads/IMG_4694.MOV")
 while True:#image_count < num_images:
     ret, frame = cap.read()
     if not ret:
         break
 
-# images = read_images_from_folder("/Users/hungnguyencong/Documents/UNITY/arfoundation-samples/Images")
+# images = read_images_from_folder("images/ImagesCameraHannah")
 # for path in images:
-#     frame = cv2.imread(path)
+    # frame = cv2.imread(path)
 
+    # frame = cv2.flip(frame, 0)
     
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -81,7 +82,7 @@ cv2.destroyAllWindows()
 ret, camera_matrix, distortion_coefficients, rvecs, tvecs = cv2.calibrateCamera(
     object_points_list, image_points_list, gray.shape[::-1], None, None)
 
-np.savez('CameraIntrinsic/calibration_data_self.npz', mtx=camera_matrix, dist=distortion_coefficients)
+# np.savez('CameraIntrinsic/calibration_data_hannah_v1.npz', mtx=camera_matrix, dist=distortion_coefficients)
 
 # Print the intrinsic parameters
 print("Camera Matrix:")
